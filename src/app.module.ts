@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { TransactionController } from './controllers/transaction/transaction.controller';
 import { TransactionService } from './services/transaction/transaction.service';
 import { TransactionSchema } from './models/transaction.schema';
+import { HelperService } from './shared/helpers/helper';
 
 const { MONGO_HOST, MONGO_DB, MONGO_PORT } = process.env;
 const url = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
@@ -15,6 +16,6 @@ const url = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
     MongooseModule.forFeature([{ 'name': 'Transaction', schema: TransactionSchema }]),
   ],
   controllers: [AppController, TransactionController],
-  providers: [AppService, TransactionService],
+  providers: [AppService, HelperService, TransactionService],
 })
 export class AppModule {}

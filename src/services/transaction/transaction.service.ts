@@ -3,12 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ITransaction } from '../../models/transaction.schema';
 import { TransactionDTO } from '../../dto/transaction.dto';
+import { HelperService } from '../../shared/helpers/helper';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectModel('Transaction') private readonly transactionModel: Model<ITransaction>,
-    // private readonly helperService: HelperService
+    private readonly helperService: HelperService
   ) {}
 
   async create(transaction: TransactionDTO): Promise<any> {
@@ -17,7 +18,7 @@ export class TransactionService {
       const savedTransaction = await newTransaction.save();
       return { id: savedTransaction._id };
     } catch (error) {
-      // await this.helperService.catchValidationError(error);
+      await this.helperService.catchValidationError(error);
     }
   }
 
@@ -33,7 +34,7 @@ export class TransactionService {
       }
       return findById;
     } catch (error) {
-      // await this.helperService.catchValidationError(error);
+      await this.helperService.catchValidationError(error);
     }
   }
 }
