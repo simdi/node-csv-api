@@ -3,33 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class TransactionDTO {
   @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  name: string;
+  @ApiProperty({
     type: Number,
   })
   @IsNumber()
-  number: number;
+  price: number;
   @ApiProperty({
     type: String,
   })
   @IsString()
-  street: string;
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  city: string;
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  zip: string;
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  state: string;
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  country: string;
+  owner: string;
 }

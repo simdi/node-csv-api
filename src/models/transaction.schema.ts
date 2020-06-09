@@ -1,19 +1,27 @@
 import * as mongoose from 'mongoose';
+import { v4 as uuid } from 'uuid';
+import { MetaSchema, IMeta } from './meta.schema';
 
 export interface ITransaction extends mongoose.Document {
-  number: number;
-  street: string;
-  city: string;
-  zip: string;
-  state: string;
-  country: string;
+  uuid: string;
+  name: string;
+  price: number;
+  owner: string;
+  meta: IMeta;
 };
 
 export const TransactionSchema = new mongoose.Schema({
-  number: { type: Number },
-  street: { type: String },
-  city: { type: String },
-  zip: { type: String },
-  state: { type: String },
-  country: { type: String },
+  uuid: { type: String },
+  name: { type: String, required: true },
+  price: { type: Number, default: 0.0 },
+  owner: { type: String, required: true },
+  meta: MetaSchema,
 });
+
+TransactionSchema.pre('save', async function() {
+  await addMeta(this);
+  await addUUID(this);
+});
+
+const addMeta = async(ctx) => ctx['meta'] = MetaSchema;
+const addUUID = async(ctx) => ctx['uuid'] = uuid();

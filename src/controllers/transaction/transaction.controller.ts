@@ -1,12 +1,11 @@
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, HttpCode, Post, Body, Request, Param, Get, UseGuards, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { Controller, HttpCode, Post, Body, Param, Get, HttpStatus } from '@nestjs/common';
 import { TransactionService } from '../../services/transaction/transaction.service';
 import { ITransaction } from '../../models/transaction.schema';
 import { TransactionDTO } from '../../dto/transaction.dto';
 import { CreatedDTO } from '../../dto/responses/created.dto';
 import { ErrorDTO } from '../../dto/responses/error.dto';
 
-@ApiBearerAuth('access_token')
 @ApiTags('Transactions')
 @Controller('transactions')
 export class TransactionController {

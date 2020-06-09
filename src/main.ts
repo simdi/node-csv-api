@@ -19,7 +19,6 @@ async function bootstrap() {
     .setTitle('Node CSV App')
     .setDescription('Node CSV App description')
     .setVersion('1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access_token')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup(`${urlPrefix}/docs`, app, document);
