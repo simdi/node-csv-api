@@ -1,4 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { pickBy, path } from 'ramda';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ExportToCsv } from 'export-to-csv';
@@ -23,28 +24,52 @@ export class TransactionService {
     }
   }
 
-  async findAll(): Promise<ITransaction[]> {
-    return await this.transactionModel.find();
+  async findAll(query: { page: string, limit: string }): Promise<ITransaction[]> {
+    return await this.transactionModel.paginate({}, {
+      page: parseInt(query.page),
+      limit: parseInt(query.limit),
+      sort: { 'meta.created': 'desc', 'meta.updated': 'desc' }
+    });
   }
 
-  async downloadAsCSV(): Promise<any> {
-    const data = await this.transactionModel.find();
-    const trimmed = await this.transform(data);
-
-    const options = { 
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalSeparator: '.',
-      showLabels: true, 
-      showTitle: true,
-      title: 'transactions',
-      useTextFile: false,
-      useBom: true,
-      useKeysAsHeaders: true,
-    };
-   
-    const csvExporter = new ExportToCsv(options);
-    return csvExporter.generateCsv(trimmed, true);
+  async downloadAsCSV(query: { page: string, limit: string, from: string, to: string }): Promise<any> {
+    try {
+      const data = await this.transactionModel.paginate(
+        {
+          ...pickBy(val => val !== undefined, { 'meta.created': path(['from'], query) && {
+              $gte: path(['from'], query),
+              $lte: path(['to'], query)
+            },
+          }),
+        },
+        {
+          page: parseInt(query.page),
+          limit: parseInt(query.limit),
+          sort: { 'meta.created': 'desc', 'meta.updated': 'desc' }
+        }
+      );
+      const trimmed = await this.transform(data.docs);
+      if (trimmed.length === 0) {
+        throw new HttpException('No record found', HttpStatus.NOT_FOUND);
+      }
+  
+      const options = { 
+        fieldSeparator: ',',
+        quoteStrings: '"',
+        decimalSeparator: '.',
+        showLabels: true, 
+        showTitle: true,
+        title: 'transactions',
+        useTextFile: false,
+        useBom: true,
+        useKeysAsHeaders: true,
+      };
+     
+      const csvExporter = new ExportToCsv(options);
+      return csvExporter.generateCsv(trimmed, true);
+    } catch (error) {
+      await this.helperService.catchValidationError(error);
+    }
   }
 
   async findById(id: string): Promise<ITransaction> {

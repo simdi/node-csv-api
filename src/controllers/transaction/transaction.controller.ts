@@ -1,5 +1,5 @@
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { Controller, HttpCode, Post, Body, Param, Get, HttpStatus, Header } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiHeader } from '@nestjs/swagger';
+import { Controller, HttpCode, Post, Body, Param, Get, HttpStatus, Header, Query } from '@nestjs/common';
 import { TransactionService } from '../../services/transaction/transaction.service';
 import { ITransaction } from '../../models/transaction.schema';
 import { TransactionDTO } from '../../dto/transaction.dto';
@@ -13,29 +13,31 @@ export class TransactionController {
 
   @Get()
   @ApiOperation({ summary: 'Get all Transactions' })
-  @ApiQuery({ name: 'page' })
-  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'page', required: true, example: 1 })
+  @ApiQuery({ name: 'limit', required: true, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The found records',
     type: [TransactionDTO],
   })
-  async findAll(): Promise<ITransaction[]> {
-    return await this.transactionService.findAll();
+  async findAll(@Query() query): Promise<ITransaction[]> {
+    return await this.transactionService.findAll(query);
   }
 
   @Get('download/csv')
   @ApiOperation({ summary: 'Download Transactions as csv' })
-  @ApiQuery({ name: 'page' })
-  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'page', required: true, example: 1 })
+  @ApiQuery({ name: 'limit', required: true, example: 10 })
+  @ApiQuery({ name: 'from', required: true, example: "2020-01-01T13:56:31.664Z"  })
+  @ApiQuery({ name: 'to', required: true, example: new Date().toISOString() })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The found records',
   })
   @Header('Content-Type', 'application/csv')
   @Header('Content-Disposition', 'attachment; filename=transactions.csv')
-  async downloadAsCSV(): Promise<ITransaction[]> {
-    return await this.transactionService.downloadAsCSV();
+  async downloadAsCSV(@Query() query): Promise<ITransaction[]> {
+    return await this.transactionService.downloadAsCSV(query);
   }
 
   @Get(':transactionId')
