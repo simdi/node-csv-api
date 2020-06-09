@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ExportToCsv } from 'export-to-csv';
 import { ITransaction } from '../../models/transaction.schema';
 import { TransactionDTO } from '../../dto/transaction.dto';
 import { HelperService } from '../../shared/helpers/helper';
@@ -26,6 +27,26 @@ export class TransactionService {
     return await this.transactionModel.find();
   }
 
+  async downloadAsCSV(): Promise<any> {
+    const data = await this.transactionModel.find();
+    const trimmed = await this.transform(data);
+
+    const options = { 
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true, 
+      showTitle: true,
+      title: 'transactions',
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+   
+    const csvExporter = new ExportToCsv(options);
+    return csvExporter.generateCsv(trimmed, true);
+  }
+
   async findById(id: string): Promise<ITransaction> {
     try {
       const findById = await this.transactionModel.findById(id);
@@ -36,5 +57,18 @@ export class TransactionService {
     } catch (error) {
       await this.helperService.catchValidationError(error);
     }
+  }
+
+  async transform(data: ITransaction[]): Promise<any> {
+    return data.map(transaction => {
+      return {
+        name: transaction.name,
+        owner: transaction.owner,
+        uuid: transaction.uuid,
+        created: transaction.meta.created,
+        updated: transaction.meta.updated,
+        price: transaction.price
+      };
+    });
   }
 }

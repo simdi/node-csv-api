@@ -29,6 +29,7 @@
     "class-transformer": "0.2.3",
     "class-validator": "0.12.2",
     "dotenv": "8.2.0",
+    "export-to-csv": "0.2.1",
     "helmet": "3.22.0",
     "mongoose": "5.9.18",
     "reflect-metadata": "^0.1.13",

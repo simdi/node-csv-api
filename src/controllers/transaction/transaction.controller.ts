@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { Controller, HttpCode, Post, Body, Param, Get, HttpStatus } from '@nestjs/common';
+import { Controller, HttpCode, Post, Body, Param, Get, HttpStatus, Header } from '@nestjs/common';
 import { TransactionService } from '../../services/transaction/transaction.service';
 import { ITransaction } from '../../models/transaction.schema';
 import { TransactionDTO } from '../../dto/transaction.dto';
@@ -22,6 +22,20 @@ export class TransactionController {
   })
   async findAll(): Promise<ITransaction[]> {
     return await this.transactionService.findAll();
+  }
+
+  @Get('download/csv')
+  @ApiOperation({ summary: 'Download Transactions as csv' })
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The found records',
+  })
+  @Header('Content-Type', 'application/csv')
+  @Header('Content-Disposition', 'attachment; filename=transactions.csv')
+  async downloadAsCSV(): Promise<ITransaction[]> {
+    return await this.transactionService.downloadAsCSV();
   }
 
   @Get(':transactionId')
