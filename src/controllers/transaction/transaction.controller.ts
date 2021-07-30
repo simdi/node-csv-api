@@ -9,7 +9,7 @@ import { ErrorDTO } from '../../dto/responses/error.dto';
 @ApiTags('Transactions')
 @Controller('transactions')
 export class TransactionController {
-  constructor(private transactionService: TransactionService) {}
+  constructor(private transactionService: TransactionService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all Transactions' })
@@ -28,7 +28,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'Download Transactions as csv' })
   @ApiQuery({ name: 'page', required: true, example: 1 })
   @ApiQuery({ name: 'limit', required: true, example: 10 })
-  @ApiQuery({ name: 'from', required: true, example: "2020-01-01T13:56:31.664Z"  })
+  @ApiQuery({ name: 'from', required: true, example: "2020-01-01T13:56:31.664Z" })
   @ApiQuery({ name: 'to', required: true, example: new Date().toISOString() })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -38,6 +38,22 @@ export class TransactionController {
   @Header('Content-Disposition', 'attachment; filename=transactions.csv')
   async downloadAsCSV(@Query() query): Promise<ITransaction[]> {
     return await this.transactionService.downloadAsCSV(query);
+  }
+
+  @Get('download/xlsx')
+  @ApiOperation({ summary: 'Download Transactions as csv' })
+  @ApiQuery({ name: 'page', required: true, example: 1 })
+  @ApiQuery({ name: 'limit', required: true, example: 10 })
+  @ApiQuery({ name: 'from', required: true, example: "2020-01-01T13:56:31.664Z" })
+  @ApiQuery({ name: 'to', required: true, example: new Date().toISOString() })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The found records',
+  })
+  @Header('Content-Type', 'application/xlsx')
+  @Header('Content-Disposition', 'attachment; filename=transactions.xlsx')
+  async downloadAsXlSX(@Query() query): Promise<ITransaction[]> {
+    return await this.transactionService.downloadAsXlSX(query);
   }
 
   @Get(':transactionId')
